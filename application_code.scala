@@ -36,11 +36,11 @@ val airbnbDataText = sc.wholeTextFiles("project/toronto_data")
 // Columns of data                                                                  -> Column indices
 // id, listing_url, picture_url, street, city, state, zipcode, country, latitude    -> 0-8
 // longitude, property_type, room_type, accommodates, bathrooms, bedrooms, beds     -> 9-15
-// bed_type, amenities, price, weekly_price, monthly_price, security_deposit        -> 16-22
-// cleaning_fee, number_of_reviews, review_scores_rating, review_scores_accuracy    -> 23-26
-// review_scores_cleanliness, review_scores_checkin, review_scores_communication    -> 27-29
-// review_scores_location, review_scores_value, cancellation_policy                 -> 30-32
-// reviews_per_month                                                                -> 33
+// bed_type, amenities, price, weekly_price, monthly_price, security_deposit        -> 16-21
+// cleaning_fee, number_of_reviews, review_scores_rating, review_scores_accuracy    -> 22-25
+// review_scores_cleanliness, review_scores_checkin, review_scores_communication    -> 26-28
+// review_scores_location, review_scores_value, cancellation_policy                 -> 29-31
+// reviews_per_month                                                                -> 32
 val airbnbDataOfInterestWithHeaders = airbnbDataText.
                                         map(_._2).
                                         flatMap(_.split("\\n")).
@@ -122,11 +122,11 @@ val crimeDataOfInterest = crimeData.filter(_ != crimeHeader).
 // Columns of data                                                                  -> Column indices
 // id, listing_url, picture_url, street, city, state, zipcode, country, latitude    -> 0-8
 // longitude, property_type, room_type, accommodates, bathrooms, bedrooms, beds     -> 9-15
-// bed_type, amenities, price, weekly_price, monthly_price, security_deposit        -> 16-22
-// cleaning_fee, number_of_reviews, review_scores_rating, review_scores_accuracy    -> 23-26
-// review_scores_cleanliness, review_scores_checkin, review_scores_communication    -> 27-29
-// review_scores_location, review_scores_value, cancellation_policy                 -> 30-32
-// reviews_per_month, num_businesses_in_neighborhood, num_crimes_in_neighborhood    -> 33-35
+// bed_type, amenities, price, weekly_price, monthly_price, security_deposit        -> 16-21
+// cleaning_fee, number_of_reviews, review_scores_rating, review_scores_accuracy    -> 22-25
+// review_scores_cleanliness, review_scores_checkin, review_scores_communication    -> 26-28
+// review_scores_location, review_scores_value, cancellation_policy                 -> 29-31
+// reviews_per_month, num_businesses_in_neighborhood, num_crimes_in_neighborhood    -> 32-34
 val augmentedData = airbnbDataOfInterest.cartesian(yelpDataOfInterest). // (airbnb, yelpdata)
                       filter(row => new DistanceCalculatorImpl().calculateDistanceInKilometer(Location(row._1(8).toDouble, row._1(9).toDouble), Location(row._2._5, row._2._6)) <= 2).
                       map(row => (row._1(0), (row._1, 1))). // (airbnbid, (airbnbdata, 1))
