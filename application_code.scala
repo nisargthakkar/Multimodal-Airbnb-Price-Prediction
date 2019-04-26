@@ -138,6 +138,5 @@ val augmentedData = airbnbDataOfInterest.cartesian(yelpDataOfInterest). // (airb
                       map(row => row._2._1._1 :+ row._2._1._2.toString :+ row._2._2.toString). // airbnbdata :+ num_yelp :+ num_crime
                       cache()
 
-augmentedData.take(1).foreach(_.foreach(println))
-
-augmentedData.saveAsTextFile("project/augmented_data_neighborhood_count")
+val relData = augmentedData.map(arr => arr(0) + "," + arr(8) + "," + arr(9) + "," + arr(33) + "," + arr(34) + "," + arr(18).drop(1).trim())
+relData.saveAsTextFile("project/relevantDataRDD1")
