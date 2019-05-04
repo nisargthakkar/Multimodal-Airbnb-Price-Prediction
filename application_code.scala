@@ -127,16 +127,22 @@ val crimeDataOfInterest = crimeData.filter(_ != crimeHeader).
 // review_scores_cleanliness, review_scores_checkin, review_scores_communication    -> 26-28
 // review_scores_location, review_scores_value, cancellation_policy                 -> 29-31
 // reviews_per_month, num_businesses_in_neighborhood, num_crimes_in_neighborhood    -> 32-34
+// avg_business_rating                                                              -> 35
 val augmentedData = airbnbDataOfInterest.cartesian(yelpDataOfInterest). // (airbnb, yelpdata)
                       filter(row => new DistanceCalculatorImpl().calculateDistanceInKilometer(Location(row._1(8).toDouble, row._1(9).toDouble), Location(row._2._5, row._2._6)) <= 2).
-                      map(row => (row._1(0), (row._1, 1))). // (airbnbid, (airbnbdata, 1))
-                      reduceByKey((accum, item) => (accum._1, accum._2 + 1)). // (airbnbid, (airbnbdata, num_yelp))
-                      cartesian(crimeDataOfInterest). // ((airbnbid, (airbnbdata, num_yelp)), crimedata)
+                      map(row => (row._1(0), (row._1, (row._2._8, 1)))). // (airbnbid, (airbnbdata, (stars, 1)))
+                      reduceByKey((accum, item) => (accum._1, (accum._2._1 + item._2._1, accum._2._2 + item._2._2))). // (airbnbid, (airbnbdata, (total_stars, num_yelp)))
+                      mapValues(row => (row._1, row._2._1 * 1.0 / row._2._2, row._2._2)). // (airbnbid, (airbnbdata, avg_stars, num_yelp))
+                      cartesian(crimeDataOfInterest). // ((airbnbid, (airbnbdata, avg_stars, num_yelp)), crimedata)
                       filter(row => new DistanceCalculatorImpl().calculateDistanceInKilometer(Location(row._1._2._1(8).toDouble, row._1._2._1(9).toDouble), Location(row._2(6).toDouble, row._2(7).toDouble)) <= 2).
-                      map(row => (row._1._1, (row._1._2, 1))). // (airbnbid, ((airbnbdata, num_yelp), 1))
-                      reduceByKey((accum, item) => (accum._1, accum._2 + 1)). // (airbnbid, ((airbnbdata, num_yelp), num_crime))
-                      map(row => row._2._1._1 :+ row._2._1._2.toString :+ row._2._2.toString). // airbnbdata :+ num_yelp :+ num_crime
+                      map(row => (row._1._1, (row._1._2, 1))). // (airbnbid, ((airbnbdata, avg_stars, num_yelp), 1))
+                      reduceByKey((accum, item) => (accum._1, accum._2 + item._2)). // (airbnbid, ((airbnbdata, avg_stars, num_yelp), num_crime))
+                      map(row => row._2._1._1 :+ row._2._1._3.toString :+ row._2._2.toString :+ row._2._1._2.toString). // airbnbdata :+ num_yelp :+ num_crime :+ avg_business_rating
                       cache()
 
-val relData = augmentedData.map(arr => arr(0) + "," + arr(8) + "," + arr(9) + "," + arr(33) + "," + arr(34) + "," + arr(18).drop(1).trim())
-relData.saveAsTextFile("project/relevantDataRDD1")
+// airbnbid,latitude,longitude,bathrooms,bedrooms,beds,review_scores_rating,review_scores_location,num_businesses_in_neighborhood,num_crimes_in_neighborhood,price,avg_business_rating
+val augmentedDataOfInterest = augmentedData.
+                map(row => (row(0), row(8), row(9), row(13), row(14), row(15), row(24), row(29), row(33), row(34), row(18).drop(1).trim(), row(35))).
+                map(_.productIterator.mkString(","))
+
+augmentedDataOfInterest.saveAsTextFile("project/airbnbPredictionData")
