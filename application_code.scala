@@ -26,7 +26,7 @@ class DistanceCalculatorImpl extends DistanceCalculator {
 
 // AIRBNB DATA
 // get data
-val airbnbDataText = sc.wholeTextFiles("project/toronto_data")
+val airbnbDataText = sc.wholeTextFiles("project_data/toronto_data")
 
 // Columns of data                                                                  -> Column indices
 // id, listing_url, picture_url, street, city, state, zipcode, country, latitude    -> 0-8
@@ -67,7 +67,7 @@ val airbnbDataOfInterest = airbnbDataOfInterestWithHeaders.
                             cache().sample(false, 0.1, 0)
 
 // YELP DATA
-val businessDataDF = sqlContext.read.json("yelp_dataset/business.json")
+val businessDataDF = sqlContext.read.json("project_data/business.json")
 
 // Columns of data      -> Data Type
 // name                 -> String
@@ -94,7 +94,7 @@ val yelpDataOfInterest = yelpInterestedColumsParsedRDD.
                                 cache().sample(false, 0.1, 0)
 
 // Crime Data
-val crimeData = sc.textFile("project/MCI_2014_to_2018.csv")
+val crimeData = sc.textFile("project_data/MCI_2014_to_2018.csv")
 val crimeHeader = crimeData.first()
 
 // Columns of data      -> Data Type
@@ -140,7 +140,7 @@ val augmentedDataOfInterest = augmentedData.
                 map(row => (row(0), row(8), row(9), row(13), row(14), row(15), row(24), row(29), row(33), row(34), row(18).drop(1).trim(), row(35))).
                 map(_.productIterator.mkString(","))
 
-augmentedDataOfInterest.saveAsTextFile("project/airbnbPredictionData")
+augmentedDataOfInterest.saveAsTextFile("project_data/airbnbPredictionData")
 
 airbnbDataOfInterest.map(_.mkString("\t")).saveAsTextFile("project/cached/airbnbDataOfInterest")
 yelpDataOfInterest.map(_.productIterator.mkString("\t")).saveAsTextFile("project/cached/yelpDataOfInterest")

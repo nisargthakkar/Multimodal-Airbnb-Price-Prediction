@@ -6,7 +6,7 @@ import org.apache.spark.mllib.linalg.{Vector, Vectors}
 
 // val finalData = sc.wholeTextFiles("project/airbnbPredictionData").flatMap(_._2.split("\\n")).map(_.split(",")).filter(_.length==6).filter(x=> !(x(4).contains('$') || x(5).contains('$')) )
 // airbnbid,latitude,longitude,bathrooms,bedrooms,beds,review_scores_rating,review_scores_location,num_businesses_in_neighborhood,num_crimes_in_neighborhood,price,avg_business_rating
-val finalData = sc.textFile("project/airbnbPredictionData").
+val finalData = sc.textFile("project_data/airbnbPredictionData").
                   flatMap(_.split("\\n")).
                   map(_.split(",")).
                   filter(_.length == 12).
