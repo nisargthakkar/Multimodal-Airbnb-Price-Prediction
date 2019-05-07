@@ -18,7 +18,7 @@ val splits = mllibData.randomSplit(Array(0.7, 0.3), seed = 11L)
 val training = splits(0).cache()
 val test = splits(1)
 val numIterations = 100000
-val stepSize = 0.000008
+val stepSize = 0.00000006
 val model = LinearRegressionWithSGD.train(training, numIterations, stepSize)
 	
 
@@ -35,3 +35,5 @@ val valuesAndPredsTest = test.map { point =>
   (point.label, prediction)
 }
 val MSE_test = valuesAndPredsTest.map{ case(v, p) => math.pow((v - p), 2) }.mean()
+
+model.save(sc, "project/AirbnbLRModel")
