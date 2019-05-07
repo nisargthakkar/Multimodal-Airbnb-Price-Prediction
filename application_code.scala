@@ -24,11 +24,6 @@ class DistanceCalculatorImpl extends DistanceCalculator {
   }
 }
 
-// SAMPLE POINT TO CALCULATE DISTANCE FROM. WILL BE INPUT FROM THE USER
-val homeLatitude = 43.726377
-val homeLongitude = -79.380968
-val homeLocation = Location(homeLatitude, homeLongitude)
-
 // AIRBNB DATA
 // get data
 val airbnbDataText = sc.wholeTextFiles("project/toronto_data")
@@ -116,7 +111,7 @@ val crimeDataOfInterest = crimeData.filter(_ != crimeHeader).
                     map(row => row.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1)).
                     map(x => Array(x(6), x(9), x(16), x(17), x(22), x(23), x(26), x(27), x(28))).
                     filter(_.forall(!_.isEmpty())). //remove rows with empty cols
-                    cache().sample(false, 0.1, 0)
+                    cache()
 
 // Final Data
 // Columns of data                                                                  -> Column indices
@@ -146,3 +141,7 @@ val augmentedDataOfInterest = augmentedData.
                 map(_.productIterator.mkString(","))
 
 augmentedDataOfInterest.saveAsTextFile("project/airbnbPredictionData")
+
+airbnbDataOfInterest.map(_.mkString("\t")).saveAsTextFile("project/cached/airbnbDataOfInterest")
+yelpDataOfInterest.map(_.productIterator.mkString("\t")).saveAsTextFile("project/cached/yelpDataOfInterest")
+crimeDataOfInterest.map(_.mkString("\t")).saveAsTextFile("project/cached/crimeDataOfInterest")
