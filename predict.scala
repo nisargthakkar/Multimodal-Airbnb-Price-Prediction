@@ -55,7 +55,6 @@ val homeLocation = Location(homeLatitude, homeLongitude)
 val airbnb_in_neighborhood = airbnbDataOfInterest.
                                 filter(_.length >= 33).
                                 filter(row => new DistanceCalculatorImpl().calculateDistanceInKilometer(homeLocation, Location(row(8).toDouble, row(9).toDouble)) <= 2)
-
 // Columns of data      -> Data Type
 // name                 -> String
 // city                 -> String
@@ -75,6 +74,7 @@ val airbnb_enhanced_data = airbnb_in_neighborhood.
                             map(row => (row._1.toDouble, row._2.toDouble, 1)).
                             reduce((accum, item) => (accum._1 + item._1, accum._2 + item._2, accum._3 + item._3))
 
+airbnb_enhanced_data.count()
 
 val scores_rating = airbnb_enhanced_data._1/airbnb_enhanced_data._3
 val scores_location = airbnb_enhanced_data._2/airbnb_enhanced_data._3
@@ -93,6 +93,6 @@ val pointFeatures = Vectors.dense(bathrooms.toDouble, bedrooms.toDouble, beds.to
 
 val predictedPrice = model.predict(pointFeatures)
 
-println("Predicted price of the Airbnb: " + predictedPrice.toString)
+println("PPP" + predictedPrice.toString+ "QQQ")
 
 exit
